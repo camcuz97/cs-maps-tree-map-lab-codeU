@@ -73,6 +73,18 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		
 		// the actual search
         // TODO: Fill this in.
+		Node search = root;
+		while(search != null){
+			if(k.compareTo(search.key) > 0){
+				search = search.right;
+			}
+			else if(k.compareTo(search.key) < 0){
+				search = search.left;
+			}
+			else{
+				return search;
+			}
+		}
         return null;
 	}
 
@@ -92,9 +104,21 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	@Override
 	public boolean containsValue(Object target) {
+		return containsValueHelper(target, root);
+	}
+	private boolean containsValueHelper(Object target, Node node){
+		if(equals(target, node.value)){
+			return true;
+		}
+		if(node.left != null){
+			return containsValueHelper(target, node.left);
+		}
+		if(node.right != null){
+			return containsValueHelper(target, node.right);
+		}
 		return false;
 	}
-
+	
 	@Override
 	public Set<Map.Entry<K, V>> entrySet() {
 		throw new UnsupportedOperationException();
@@ -118,7 +142,15 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	public Set<K> keySet() {
 		Set<K> set = new LinkedHashSet<K>();
         // TODO: Fill this in.
+		inOrderHelp(root, set);
 		return set;
+	}
+	private void inOrderHelp(Node node, Set<K> set){
+		if(node != null){
+			inOrderHelp(node.left, set);
+			set.add(node.key);
+			inOrderHelp(node.right, set);
+		}
 	}
 
 	@Override
@@ -136,7 +168,33 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	private V putHelper(Node node, K key, V value) {
         // TODO: Fill this in.
-        return null;
+		@SuppressWarnings("unchecked")
+		Comparable<? super K> k = (Comparable<? super K>) key;
+		if(k.compareTo(node.key) > 0){
+			if(node.right != null){
+				return putHelper(node.right, key, value);
+			}
+			else{
+				node.right = new Node(key, value);
+				size++;
+				return null;
+			}
+		}
+		else if(k.compareTo(node.key) < 0){
+			if(node.left != null){
+				return putHelper(node.left, key, value);
+			}
+			else{
+				node.left = new Node(key, value);
+				size++;
+				return null;
+			}
+		}
+		else{
+			V retVal = node.value;
+			node.value = value;
+			return retVal;
+		}
 	}
 
 	@Override
